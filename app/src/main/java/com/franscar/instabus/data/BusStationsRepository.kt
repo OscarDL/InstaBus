@@ -1,11 +1,15 @@
 package com.franscar.instabus.data
 
+import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import androidx.annotation.WorkerThread
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.lifecycle.MutableLiveData
+import com.franscar.instabus.R
+import com.franscar.instabus.MainActivity
 import com.franscar.instabus.utilities.FileHelper
 import com.franscar.instabus.utilities.WEB_SERVICE_URL
 import com.franscar.instabus.utilities.refreshData
@@ -49,7 +53,7 @@ class BusStationsRepository(val app: Application) {
         } else {
             val data = readDataFromCache()
             if (data.isEmpty()) {
-                Log.i("BusStationsRepository", "NO NETWORK AVAILABLE AND CACHE IS EMPTY")
+                return
             } else {
                 busStationsData.postValue(data)
                 Log.i("BusStationsRepository", "READING_DATA_FROM_CACHE")
