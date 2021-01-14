@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:foreground="?selectableItemBackground"
     android:layout_marginHorizontal="10dp"
     android:layout_height="wrap_content"
@@ -20,6 +21,7 @@
         android:padding="10dp">
 
         <ImageView
+            android:contentDescription="@string/icon"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_bus_48dp"
             android:layout_marginBottom="10dp"
@@ -28,7 +30,7 @@
             android:layout_marginEnd="10dp"
             android:id="@+id/busStationIcon"
             android:layout_height="48dp"
-            android:layout_width="48dp" />
+            android:layout_width="48dp"/>
 
         <LinearLayout
             android:layout_alignBottom="@id/busStationIcon"
@@ -46,8 +48,10 @@
                 android:layout_width="wrap_content"
                 android:id="@+id/busStationStreet"
                 android:layout_marginStart="10dp"
-                android:textSize="20sp"
-                android:text="TEST TITLE"/>
+                tools:ignore="RtlSymmetry"
+                android:paddingEnd="10dp"
+                android:singleLine="true"
+                android:textSize="20sp"/>
 
             <TextView
                 app:layout_constraintEnd_toStartOf="parent"
@@ -57,8 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="10dp"
-                android:textSize="12sp"
-                android:text="TEST Description" />
+                android:textSize="12sp"/>
 
         </LinearLayout>
 
