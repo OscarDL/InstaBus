@@ -17,7 +17,7 @@ class EmptyHomeRecyclerAdapter(val context: Context): RecyclerView.Adapter<Empty
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.busStationStreet)
         val desc: TextView = itemView.findViewById(R.id.busStationDistance)
-        val image: ImageView = itemView.findViewById(R.id.busStationIcon)
+        val icon: ImageView = itemView.findViewById(R.id.busStationIcon)
 
         init {
             itemView.setOnClickListener {
@@ -34,10 +34,10 @@ class EmptyHomeRecyclerAdapter(val context: Context): RecyclerView.Adapter<Empty
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.title.text = null
         holder.desc.text = null
-        holder.image.setImageResource(R.drawable.ic_bus_48dp)
+        holder.icon.setImageResource(R.drawable.ic_bus_48dp)
 
         if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO) {
-            holder.image.setColorFilter(ContextCompat.getColor(context, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN)
+            holder.icon.setColorFilter(ContextCompat.getColor(context, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN)
         }
     }
 

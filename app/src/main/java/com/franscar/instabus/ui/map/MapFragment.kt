@@ -17,6 +17,7 @@ import androidx.navigation.Navigation
 import androidx.preference.PreferenceManager
 import com.franscar.instabus.BuildConfig
 import com.franscar.instabus.R
+import com.franscar.instabus.ui.shared.SharedViewModel
 import com.franscar.instabus.utilities.refreshMap
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -30,7 +31,7 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 class MapFragment : Fragment() {
 
-    private lateinit var mapViewModel: MapViewModel
+    private lateinit var mapViewModel: SharedViewModel
     private lateinit var navController: NavController
 
     override fun onCreateView(
@@ -41,7 +42,7 @@ class MapFragment : Fragment() {
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
 
-        mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+        mapViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_map, container, false)
 
         val ctx = requireActivity().applicationContext
@@ -66,7 +67,7 @@ class MapFragment : Fragment() {
             map.controller.setCenter(GeoPoint(40.9, 1.7))
             Handler(Looper.getMainLooper()).postDelayed({
                 map.controller.animateTo(gPoint, 16.0, 2000)
-            }, 500)
+            }, 200)
             refreshMap = false
         } else {
             map.controller.setZoom(16.0)
@@ -107,7 +108,7 @@ class MapFragment : Fragment() {
         defaultMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         map.overlays.add(defaultMarker)
 
-        mapViewModel.busStationsData.observe(viewLifecycleOwner, Observer {
+        mapViewModel.busStationsData.observe(viewLifecycleOwner, {
             for (item in it) {
                 val busMarker = Marker(map)
                 busMarker.icon = stationPin
@@ -131,6 +132,7 @@ class MapFragment : Fragment() {
                             ""
                         ) + "m away")
                         .setPositiveButton(" View Photos ") { _, _ ->
+                            mapViewModel.selectedBusStation.value = item
                             navController.navigate(R.id.action_map_to_bus_station)
                         }
                         .create()

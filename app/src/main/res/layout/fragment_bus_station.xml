@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".BusStationFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <data>
+        <variable
+            name="busStationViewModel"
+            type="com.franscar.instabus.ui.shared.SharedViewModel"/>
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        tools:context=".ui.bus_station.BusStationFragment"
+        android:id="@+id/bus_station_fragment">
 
-</FrameLayout>
+        <!-- <androidx.recyclerview.widget.RecyclerView
+            tools:listitem="@layout/bus_station_list_item"
+            android:id="@+id/bus_station_recycler_view"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp"/> -->
+
+        <TextView
+            app:street_name="@{busStationViewModel.selectedBusStation.street_name}"
+            android:id="@+id/bus_station_image_title"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:textStyle="bold"
+            android:textSize="36sp"/>
+
+    </FrameLayout>
+
+</layout>

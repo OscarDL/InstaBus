@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.franscar.instabus.R
@@ -43,11 +41,6 @@ class HomeRecyclerAdapter(val context: Context, private val busStations: List<Bu
     }
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-//        init {
-//            itemView.setOnClickListener {
-//                // GO TO NEW ACTIVITY
-//            }
-//        }
         val busStationIcon: ImageView = itemView.findViewById(R.id.busStationIcon)
         val busStationStreet: TextView = itemView.findViewById(R.id.busStationStreet)
         val busStationDistance: TextView = itemView.findViewById(R.id.busStationDistance)

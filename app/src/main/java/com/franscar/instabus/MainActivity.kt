@@ -62,23 +62,8 @@ class MainActivity : AppCompatActivity() {
         @Suppress("DEPRECATION")
         @RequiresApi(Build.VERSION_CODES.M)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
-
-        // Request Location permission
-        /*if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PermissionChecker.PERMISSION_GRANTED) {
-            Log.i("LOCATION", "LOCATION GRANTED")
-        } else {
-            Log.i("LOCATION", "LOCATION DENIED")
-            ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    1
-            )
-        }*/
     }
 
 }

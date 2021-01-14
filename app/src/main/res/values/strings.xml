@@ -1,4 +1,5 @@
 <resources>
+    <string name="icon">Icon</string>
     <string name="app_name">InstaBus</string>
     <string name="title_home">Home</string>
     <string name="title_map">Visual Map</string>

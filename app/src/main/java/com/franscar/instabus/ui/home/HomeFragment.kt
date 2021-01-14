@@ -6,18 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.franscar.instabus.R
 import com.franscar.instabus.data.BusStations
 import com.franscar.instabus.data.BusStationsService
+import com.franscar.instabus.ui.shared.SharedViewModel
 import com.franscar.instabus.utilities.FileHelper
 import com.franscar.instabus.utilities.WEB_SERVICE_URL
 import com.squareup.moshi.JsonAdapter
@@ -30,10 +31,9 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-
 class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
 
-    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var homeViewModel: SharedViewModel
     private lateinit var navController: NavController
 
     private lateinit var swipeLayout: SwipeRefreshLayout
@@ -45,7 +45,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
             savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+        homeViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
 
         recyclerView = root.findViewById(R.id.home_list_recycler_view)
@@ -68,7 +68,6 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
                 Log.i("BusStationsRepository", "PULLING_DATA_FROM_WEB")
 
                 if (serviceData != null) {
-                    val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
                     val listType = Types.newParameterizedType(List::class.java, BusStations::class.java)
                     val adapter: JsonAdapter<List<BusStations>> = moshi.adapter(listType)
 
@@ -95,7 +94,24 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
         recyclerView.adapter = EmptyHomeRecyclerAdapter(requireContext())
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        homeViewModel.busStationsData.observe(viewLifecycleOwner, Observer {
+        // SWIPE CARD TO LEFT
+        /*val itemTouchHelperCallback: ItemTouchHelper.SimpleCallback =
+            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    // Row is swiped from recycler view
+                    // remove it from adapter
+                }
+            }
+        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)*/
+
+        homeViewModel.busStationsData.observe(viewLifecycleOwner, {
             recyclerView.adapter = HomeRecyclerAdapter(requireContext(), it, this)
         })
 
@@ -103,6 +119,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
     }
 
     override fun onBusStationItemClick(busStation: BusStations) {
+        homeViewModel.selectedBusStation.value = busStation
         navController.navigate(R.id.action_home_to_bus_station)
     }
 }
