@@ -11,9 +11,10 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.franscar.instabus.R
-import com.franscar.instabus.data.BusStations
+import com.franscar.instabus.data.BusStation
 
-class HomeRecyclerAdapter(val context: Context, private val busStations: List<BusStations>, private val itemListener:
+class HomeRecyclerAdapter(
+    private val context: Context, private val busStations: List<BusStation>, private val itemListener:
   BusStationsItemListener): RecyclerView.Adapter<HomeRecyclerAdapter.ViewHolder>() {
     override fun getItemCount(): Int { return busStations.size }
 
@@ -47,6 +48,6 @@ class HomeRecyclerAdapter(val context: Context, private val busStations: List<Bu
     }
 
     interface BusStationsItemListener {
-        fun onBusStationItemClick(busStation: BusStations)
+        fun onBusStationItemClick(busStation: BusStation)
     }
 }

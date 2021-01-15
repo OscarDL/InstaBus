@@ -8,10 +8,10 @@ data class ResponseData (
 )
 
 data class NearStations (
-    val nearstations: List<BusStations>
+    val nearstations: List<BusStation>
 )
 
-data class BusStations (
+data class BusStation (
     @Json(name="id") val id_station: Int,
     val street_name: String,
     val city: String,

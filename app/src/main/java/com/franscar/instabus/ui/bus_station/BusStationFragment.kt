@@ -1,6 +1,7 @@
 package com.franscar.instabus.ui.bus_station
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -11,8 +12,9 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.franscar.instabus.MainActivity
 import com.franscar.instabus.R
-import com.franscar.instabus.databinding.FragmentBusStationBinding
 import com.franscar.instabus.ui.shared.SharedViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 class BusStationFragment : Fragment() {
 
@@ -21,17 +23,24 @@ class BusStationFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
+        setHasOptionsMenu(true)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         busStationViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
-        (activity as MainActivity).supportActionBar?.title = busStationViewModel.selectedBusStation.value?.street_name
+        busStationViewModel.selectedBusStation.observe(viewLifecycleOwner, {
+            (activity as MainActivity).supportActionBar?.title = it.street_name
+            Log.i("BUS STATION FRAGMENT", it.toString())
+        })
 
-        val binding = FragmentBusStationBinding.inflate(inflater, container, false)
-        binding.busStationViewModel = busStationViewModel
-        binding.lifecycleOwner = this
-        setHasOptionsMenu(true)
+        return inflater.inflate(R.layout.fragment_bus_station, container, false)
+    }
 
-        return binding.root
+    override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(root, savedInstanceState)
+        root.findViewById<FloatingActionButton>(R.id.add_photo).setOnClickListener { view ->
+            Snackbar.make(view, "Take a picture!", Snackbar.LENGTH_SHORT)
+                .setAction("Action", null).show()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

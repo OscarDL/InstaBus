@@ -7,16 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.franscar.instabus.R
-import com.franscar.instabus.data.BusStations
+import com.franscar.instabus.data.BusStation
 import com.franscar.instabus.data.BusStationsService
 import com.franscar.instabus.ui.shared.SharedViewModel
 import com.franscar.instabus.utilities.FileHelper
@@ -51,7 +49,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
         recyclerView = root.findViewById(R.id.home_list_recycler_view)
         swipeLayout = root.findViewById(R.id.home_list_swipe_layout)
         swipeLayout.setOnRefreshListener {
-            val busStationsData = MutableLiveData<List<BusStations>>()
+            val busStationsData = MutableLiveData<List<BusStation>>()
 
             CoroutineScope(Dispatchers.IO).launch {
                 val moshi = Moshi.Builder()
@@ -68,8 +66,8 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
                 Log.i("BusStationsRepository", "PULLING_DATA_FROM_WEB")
 
                 if (serviceData != null) {
-                    val listType = Types.newParameterizedType(List::class.java, BusStations::class.java)
-                    val adapter: JsonAdapter<List<BusStations>> = moshi.adapter(listType)
+                    val listType = Types.newParameterizedType(List::class.java, BusStation::class.java)
+                    val adapter: JsonAdapter<List<BusStation>> = moshi.adapter(listType)
 
                     val json = adapter.toJson(serviceData)
                     FileHelper.saveToTextFile(requireActivity().application, json)
@@ -118,7 +116,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
         return root
     }
 
-    override fun onBusStationItemClick(busStation: BusStations) {
+    override fun onBusStationItemClick(busStation: BusStation) {
         homeViewModel.selectedBusStation.value = busStation
         navController.navigate(R.id.action_home_to_bus_station)
     }

@@ -1,15 +1,11 @@
 package com.franscar.instabus.data
 
-import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import androidx.annotation.WorkerThread
-import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.lifecycle.MutableLiveData
-import com.franscar.instabus.R
-import com.franscar.instabus.MainActivity
 import com.franscar.instabus.utilities.FileHelper
 import com.franscar.instabus.utilities.WEB_SERVICE_URL
 import com.franscar.instabus.utilities.refreshData
@@ -24,7 +20,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 class BusStationsRepository(val app: Application) {
-    val busStationsData = MutableLiveData<List<BusStations>>()
+    val busStationsData = MutableLiveData<List<BusStation>>()
 
     init {
         refreshData()
@@ -73,21 +69,21 @@ class BusStationsRepository(val app: Application) {
         }
     }
 
-    private fun saveDataToCache(busStationsData: List<BusStations>) {
+    private fun saveDataToCache(busStationsData: List<BusStation>) {
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        val listType = Types.newParameterizedType(List::class.java, BusStations::class.java)
-        val adapter: JsonAdapter<List<BusStations>> = moshi.adapter(listType)
+        val listType = Types.newParameterizedType(List::class.java, BusStation::class.java)
+        val adapter: JsonAdapter<List<BusStation>> = moshi.adapter(listType)
 
         val json = adapter.toJson(busStationsData)
         FileHelper.saveToTextFile(app, json)
     }
 
-    private fun readDataFromCache(): List<BusStations> {
+    private fun readDataFromCache(): List<BusStation> {
         val json = FileHelper.readTextFile(app) ?: return emptyList()
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        val listType = Types.newParameterizedType(List::class.java, BusStations::class.java)
+        val listType = Types.newParameterizedType(List::class.java, BusStation::class.java)
 
-        val adapter: JsonAdapter<List<BusStations>> = moshi.adapter(listType)
+        val adapter: JsonAdapter<List<BusStation>> = moshi.adapter(listType)
         return adapter.fromJson(json) ?: emptyList()
     }
 }

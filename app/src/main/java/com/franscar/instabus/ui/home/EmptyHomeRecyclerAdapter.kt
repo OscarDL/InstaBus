@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.franscar.instabus.R
 
-class EmptyHomeRecyclerAdapter(val context: Context): RecyclerView.Adapter<EmptyHomeRecyclerAdapter.ViewHolder>() {
+class EmptyHomeRecyclerAdapter(private val context: Context): RecyclerView.Adapter<EmptyHomeRecyclerAdapter.ViewHolder>() {
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.busStationStreet)
         val desc: TextView = itemView.findViewById(R.id.busStationDistance)
