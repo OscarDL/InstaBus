@@ -9,12 +9,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -30,11 +28,11 @@ import java.util.concurrent.Executors
 class CameraFragment : Fragment() {
 
     private lateinit var navController: NavController
-
-    private var imageCapture: ImageCapture? = null
-
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
+
+    private var imageCapture: ImageCapture? = null
+    private var selectedCamera = CameraSelector.DEFAULT_BACK_CAMERA
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,7 +48,7 @@ class CameraFragment : Fragment() {
         super.onViewCreated(root, savedInstanceState)
 
         if (allPermissionsGranted()) {
-            startCamera()
+            startCamera(selectedCamera)
         } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
@@ -58,7 +56,20 @@ class CameraFragment : Fragment() {
         outputDirectory = getOutputDirectory()
 
         camera_button.setOnClickListener { takePhoto() }
+        flip_button.setOnClickListener { flipCamera(selectedCamera) }
+
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun flipCamera(camera: CameraSelector) {
+        selectedCamera =
+            if (camera == CameraSelector.DEFAULT_BACK_CAMERA) {
+                CameraSelector.DEFAULT_FRONT_CAMERA
+            } else {
+                CameraSelector.DEFAULT_BACK_CAMERA
+            }
+        cameraExecutor.shutdown()
+        startCamera(selectedCamera)
     }
 
     private fun takePhoto() {
@@ -102,7 +113,7 @@ class CameraFragment : Fragment() {
             mediaDir else requireContext().filesDir
     }
 
-    private fun startCamera() {
+    private fun startCamera(cameraSelector: CameraSelector) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
@@ -114,9 +125,20 @@ class CameraFragment : Fragment() {
                     it.setSurfaceProvider(camera_viewfinder.surfaceProvider)
                 }
 
-            imageCapture = ImageCapture.Builder().build()
+            val camera = cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview)
+            flash_button.setOnClickListener {
+                if (camera.cameraInfo.hasFlashUnit()) {
+                    if (camera.cameraInfo.torchState.value == TorchState.OFF) {
+                        camera.cameraControl.enableTorch(true)
+                        flash_button.setCompoundDrawablesWithIntrinsicBounds(null, ResourcesCompat.getDrawable(resources, R.drawable.ic_flash_on_36dp, null), null, null)
+                    } else {
+                        camera.cameraControl.enableTorch(false)
+                        flash_button.setCompoundDrawablesWithIntrinsicBounds(null, ResourcesCompat.getDrawable(resources, R.drawable.ic_flash_off_36dp, null), null, null)
+                    }
+                }
+            }
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            imageCapture = ImageCapture.Builder().build()
 
             try {
                 // Unbind use cases before rebinding
@@ -135,12 +157,22 @@ class CameraFragment : Fragment() {
         IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                startCamera()
+                startCamera(selectedCamera)
             } else {
                 Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
                 return
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        cameraExecutor.shutdown()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startCamera(selectedCamera)
     }
 
     override fun onDestroy() {
