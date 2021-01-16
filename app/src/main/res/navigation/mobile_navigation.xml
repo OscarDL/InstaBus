@@ -35,7 +35,16 @@
     <fragment
         android:id="@+id/busStationFragment"
         android:name="com.franscar.instabus.ui.bus_station.BusStationFragment"
-        android:label="@string/title_bus_station"
-        tools:layout="@layout/fragment_bus_station" />
+        tools:layout="@layout/fragment_bus_station" >
+        <action
+            android:id="@+id/action_bus_station_to_camera"
+            app:destination="@id/cameraFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.franscar.instabus.ui.camera.CameraFragment"
+        android:label="@string/title_camera"
+        tools:layout="@layout/fragment_camera" />
 
 </navigation>

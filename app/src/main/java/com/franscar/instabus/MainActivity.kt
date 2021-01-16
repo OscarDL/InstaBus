@@ -28,9 +28,11 @@ class MainActivity : AppCompatActivity() {
                 .setTitle("Location Access Request")
                 .setMessage("Enabling in-app location will help you know where and how far the bus stations are relative to you.")
                 .setPositiveButton("ACCEPT") { _, _ ->
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 99)
+                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
                 }
-                .setNegativeButton("DENY") { _, _ -> }
+                .setNegativeButton("DENY") { _, _ ->
+                    // DO SOMETHING IF NECESSARY
+                }
                 .create()
                 .show()
         }

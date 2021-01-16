@@ -6,7 +6,7 @@
     <string name="title_settings">Settings</string>
     <string name="title_profile">Profile</string>
     <string name="title_results">Results</string>
-    <string name="title_bus_station">Bus Station</string>
+    <string name="title_camera">Camera</string>
     <string name="title_competitions">Competitions</string>
     <string name="title_live_results">Live results</string>
     <string name="title_activity_login">LoginActivity</string>
@@ -20,4 +20,6 @@
     <string name="login_failed">"Login failed"</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="picture_title">Your picture\'s title</string>
 </resources>

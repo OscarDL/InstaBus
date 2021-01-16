@@ -37,9 +37,8 @@ class BusStationFragment : Fragment() {
 
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
         super.onViewCreated(root, savedInstanceState)
-        root.findViewById<FloatingActionButton>(R.id.add_photo).setOnClickListener { view ->
-            Snackbar.make(view, "Take a picture!", Snackbar.LENGTH_SHORT)
-                .setAction("Action", null).show()
+        root.findViewById<FloatingActionButton>(R.id.add_photo).setOnClickListener {
+            navController.navigate(R.id.action_bus_station_to_camera)
         }
     }
 
