@@ -22,4 +22,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="take_photo">Take Photo</string>
     <string name="picture_title">Your picture\'s title</string>
+    <string name="flip_camera">Flip camera</string>
+    <string name="toggle_flash">Toggle flash</string>
 </resources>

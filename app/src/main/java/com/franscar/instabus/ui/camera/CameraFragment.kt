@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -125,15 +124,15 @@ class CameraFragment : Fragment() {
                     it.setSurfaceProvider(camera_viewfinder.surfaceProvider)
                 }
 
-            val camera = cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview)
+            val camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview)
             flash_button.setOnClickListener {
                 if (camera.cameraInfo.hasFlashUnit()) {
                     if (camera.cameraInfo.torchState.value == TorchState.OFF) {
                         camera.cameraControl.enableTorch(true)
-                        flash_button.setCompoundDrawablesWithIntrinsicBounds(null, ResourcesCompat.getDrawable(resources, R.drawable.ic_flash_on_36dp, null), null, null)
+                        flash_button.setImageResource(R.drawable.ic_flash_on_36dp)
                     } else {
                         camera.cameraControl.enableTorch(false)
-                        flash_button.setCompoundDrawablesWithIntrinsicBounds(null, ResourcesCompat.getDrawable(resources, R.drawable.ic_flash_off_36dp, null), null, null)
+                        flash_button.setImageResource(R.drawable.ic_flash_off_36dp)
                     }
                 }
             }
@@ -182,8 +181,8 @@ class CameraFragment : Fragment() {
 
     companion object {
         private const val TAG = "CameraXBasic"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 2
+        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 

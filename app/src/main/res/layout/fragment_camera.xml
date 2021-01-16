@@ -28,8 +28,7 @@
         android:layout_above="@id/camera_button"/>
     -->
 
-    <Button
-        android:paddingTop="11dp"
+    <ImageButton
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:id="@+id/flash_button"
@@ -37,11 +36,11 @@
         android:layout_marginBottom="30dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:drawableTop="@drawable/ic_flash_off_36dp"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_flash_off_36dp"
+        android:contentDescription="@string/toggle_flash"/>
 
-    <Button
-        android:radius="64dp"
+    <ImageButton
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:id="@+id/camera_button"
@@ -49,19 +48,20 @@
         android:layout_marginBottom="30dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/camera_button"
-        android:drawableTop="@drawable/ic_camera_36dp"/>
+        android:src="@drawable/ic_shutter_64dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/title_camera"/>
 
-    <Button
-        android:paddingBottom="7dp"
+    <ImageButton
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:id="@+id/flip_button"
         android:layout_marginEnd="66dp"
         android:layout_marginBottom="30dp"
+        android:src="@drawable/ic_flip_48dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:drawableTop="@drawable/ic_flip_48dp"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/flip_camera"/>
 
 </RelativeLayout>
