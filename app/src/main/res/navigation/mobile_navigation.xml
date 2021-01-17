@@ -55,6 +55,10 @@
         android:id="@+id/pictureFragment"
         android:name="com.franscar.instabus.ui.picture.PictureFragment"
         android:label="Picture"
-        tools:layout="@layout/fragment_picture" />
+        tools:layout="@layout/fragment_picture">
+        <action
+            android:id="@+id/action_picture_to_bus_station"
+            app:destination="@id/busStationFragment" />
+    </fragment>
 
 </navigation>

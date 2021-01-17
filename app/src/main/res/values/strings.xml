@@ -24,4 +24,5 @@
     <string name="picture_title">Your picture\'s title</string>
     <string name="flip_camera">Flip camera</string>
     <string name="toggle_flash">Toggle flash</string>
+    <string name="save_picture">Save Picture</string>
 </resources>

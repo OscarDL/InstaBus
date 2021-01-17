@@ -1,31 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<com.facebook.shimmer.ShimmerFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment"
-    android:id="@+id/fragment_home">
+    android:layout_width="match_parent"
+    android:id="@+id/home_shimmer"
+    app:shimmer_base_alpha="0.5"
+    app:shimmer_highlight_alpha="1">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:id="@+id/home_list_swipe_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        tools:context=".ui.home.HomeFragment"
+        android:id="@+id/fragment_home">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/home_list_recycler_view"
-            tools:listitem="@layout/home_list_item"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/home_list_swipe_layout"
             android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:layout_marginBottom="70dp"
-            android:clipToPadding="false"
-            android:paddingBottom="12dp"/>
+            android:layout_width="match_parent">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/home_list_recycler_view"
+                    tools:listitem="@layout/home_list_item"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_marginBottom="70dp"
+                    android:clipToPadding="false"
+                    android:paddingBottom="10dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.facebook.shimmer.ShimmerFrameLayout>

@@ -26,7 +26,7 @@ android {
         }
     }
     buildFeatures {
-        dataBinding = true
+        dataBinding true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -80,4 +80,6 @@ dependencies {
     implementation "androidx.camera:camera-camera2:1.0.0-rc01"
     implementation "androidx.camera:camera-lifecycle:1.0.0-rc01"
     implementation "androidx.camera:camera-view:1.0.0-alpha20"
+
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
 }

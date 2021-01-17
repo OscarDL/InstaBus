@@ -14,19 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/camera_button"/>
-    <!-- android:layout_above="@id/picture_title"/>
-
-    REPLACE WITH RELATIVE OR LINEAR LAYOUT TO ADD EDIT TEXT ///// OR GO TO NEW FRAGMENT ONCE PICTURE TAKEN?
-    <TextView
-        android:id="@+id/picture_title"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="5dp"
-        android:text="@string/picture_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@id/camera_button"/>
-    -->
 
     <ImageButton
         android:layout_width="64dp"
@@ -36,8 +23,8 @@
         android:layout_marginBottom="30dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/transparent"
         android:src="@drawable/ic_flash_off_36dp"
+        android:background="@android:color/transparent"
         android:contentDescription="@string/toggle_flash"/>
 
     <ImageButton

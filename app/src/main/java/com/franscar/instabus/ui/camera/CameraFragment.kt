@@ -13,9 +13,11 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.franscar.instabus.R
+import com.franscar.instabus.ui.picture.PictureFragment
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import java.text.SimpleDateFormat
@@ -26,9 +28,11 @@ import java.util.concurrent.Executors
 
 class CameraFragment : Fragment() {
 
-    private lateinit var navController: NavController
     private lateinit var outputDirectory: File
+    private lateinit var navController: NavController
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var cameraViewModel: CameraViewModel
+    private lateinit var orientationEventListener: OrientationEventListener
 
     private var imageCapture: ImageCapture? = null
     private var selectedCamera = CameraSelector.DEFAULT_BACK_CAMERA
@@ -39,6 +43,7 @@ class CameraFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
+        cameraViewModel = ViewModelProvider(requireActivity()).get(CameraViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         return inflater.inflate(R.layout.fragment_camera, container, false)
     }
@@ -77,25 +82,27 @@ class CameraFragment : Fragment() {
         // Add timestamp to output file name
         val photoFile = File(
             outputDirectory,
-            SimpleDateFormat(FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + ".jpg")
+            SimpleDateFormat(
+                FILENAME_FORMAT, Locale.US
+            ).format(System.currentTimeMillis()) + ".jpg"
+        )
 
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
         // Set up image capture listener, which is triggered after photo has been taken
         imageCapture.takePicture(
-            outputOptions, ContextCompat.getMainExecutor(requireContext()), object : ImageCapture.OnImageSavedCallback {
+            outputOptions,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo capture succeeded: $savedUri"
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
-                    navController.navigate(R.id.action_camera_to_picture)
                     cameraExecutor.shutdown()
+                    cameraViewModel.imageSrc.value = photoFile
+                    navController.navigate(R.id.action_camera_to_picture)
                 }
             })
     }
@@ -144,17 +151,42 @@ class CameraFragment : Fragment() {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
                 // Bind use cases to camera
-                cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview, imageCapture)
-            } catch(exc: Exception) {
+                cameraProvider.bindToLifecycle(
+                    viewLifecycleOwner,
+                    cameraSelector,
+                    preview,
+                    imageCapture
+                )
+            } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
+
+            orientationEventListener = object: OrientationEventListener(context) {
+                override fun onOrientationChanged(orientation: Int) {
+                    // Monitors orientation values to determine the target rotation value
+                    val rotation = if (orientation in 45..134) {
+                        Surface.ROTATION_270
+                    } else if (orientation in 135..224) {
+                        Surface.ROTATION_180
+                    } else if (orientation in 225..314) {
+                        Surface.ROTATION_90
+                    } else {
+                        Surface.ROTATION_0
+                    }
+
+                    imageCapture?.targetRotation = rotation
+                }
+            }
+
+            orientationEventListener.enable()
 
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
+        IntArray
+    ) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 startCamera(selectedCamera)
@@ -175,8 +207,8 @@ class CameraFragment : Fragment() {
         startCamera(selectedCamera)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         cameraExecutor.shutdown()
     }
 

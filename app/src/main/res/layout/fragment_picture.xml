@@ -12,13 +12,14 @@
         android:id="@+id/picture"
         android:layout_margin="10dp"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_above="@id/picture_title"
-        android:contentDescription="@string/picture_title"
-        android:layout_height="@android:dimen/thumbnail_height"/>
+        android:contentDescription="@string/picture_title" />
 
     <TextView
         android:textSize="16sp"
+        android:layout_marginTop="40dp"
         android:id="@+id/picture_title"
         android:labelFor="@id/picture_name"
         android:layout_width="wrap_content"
@@ -32,19 +33,19 @@
         android:layout_height="50dp"
         android:id="@+id/picture_name"
         android:layout_width="match_parent"
-        android:layout_above="@id/done_button"
         android:layout_marginHorizontal="50dp"
         android:layout_centerHorizontal="true"
+        android:layout_above="@id/save_picture_button"
         android:autofillHints="@string/picture_title"/>
 
     <Button
         android:radius="64dp"
         android:layout_height="50dp"
-        android:id="@+id/done_button"
         android:layout_marginTop="20dp"
-        android:text="@string/take_photo"
         android:layout_marginBottom="30dp"
+        android:text="@string/save_picture"
         android:layout_width="wrap_content"
+        android:id="@+id/save_picture_button"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
 

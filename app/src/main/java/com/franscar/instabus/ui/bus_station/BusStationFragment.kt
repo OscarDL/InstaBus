@@ -29,7 +29,6 @@ class BusStationFragment : Fragment() {
 
         busStationViewModel.selectedBusStation.observe(viewLifecycleOwner, {
             (activity as MainActivity).supportActionBar?.title = it.street_name
-            Log.i("BUS STATION FRAGMENT", it.toString())
         })
 
         return inflater.inflate(R.layout.fragment_bus_station, container, false)
