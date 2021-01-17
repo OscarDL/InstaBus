@@ -39,7 +39,7 @@ class CameraFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        navController = Navigation.findNavController(requireActivity(), R.id.bus_station_fragment)
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         return inflater.inflate(R.layout.fragment_camera, container, false)
     }
 
@@ -94,7 +94,8 @@ class CameraFragment : Fragment() {
                     val savedUri = Uri.fromFile(photoFile)
                     val msg = "Photo capture succeeded: $savedUri"
                     Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
-                    Log.i(TAG, msg)
+                    navController.navigate(R.id.action_camera_to_picture)
+                    cameraExecutor.shutdown()
                 }
             })
     }
