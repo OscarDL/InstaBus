@@ -11,5 +11,5 @@ data class UserImage(
     val image: String,
     val title: String,
     val date: String,
-    val location: String
+    val station: String
 )

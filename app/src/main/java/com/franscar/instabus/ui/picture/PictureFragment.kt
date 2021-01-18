@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.exifinterface.media.ExifInterface
@@ -18,9 +19,12 @@ import com.franscar.instabus.R
 import com.franscar.instabus.data.images.UserImage
 import com.franscar.instabus.data.images.UserImageDatabase
 import com.franscar.instabus.ui.camera.CameraViewModel
+import com.franscar.instabus.ui.shared.SharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.DateFormat.getDateTimeInstance
+import java.util.*
 
 class PictureFragment : Fragment() {
 
@@ -36,8 +40,10 @@ class PictureFragment : Fragment() {
         val image = root.findViewById<ImageView>(R.id.picture)
 
         setHasOptionsMenu(true)
-        cameraViewModel = ViewModelProvider(requireActivity()).get(CameraViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+        cameraViewModel = ViewModelProvider(requireActivity()).get(CameraViewModel::class.java)
+
+        //TODO: FIX ROTATION ISSUE, UNDER SHOULD NOT BE NECESSARY AND CREATES LAYOUT BOUND ISSUES
 
         when (ExifInterface(cameraViewModel.imageSrc.value!!).getAttributeInt(
             ExifInterface.TAG_ORIENTATION,
@@ -53,32 +59,30 @@ class PictureFragment : Fragment() {
         return root
     }
 
-    interface OnGetFromUserClickListener {
-        fun getFromUser(message: String?)
-    }
-
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
         super.onViewCreated(root, savedInstanceState)
 
         val userImageDao = UserImageDatabase.getDatabase(requireContext()).userImageDao()
+        val name = root.findViewById<EditText>(R.id.picture_name)
 
         root.findViewById<Button>(R.id.save_picture_button).setOnClickListener {
-            //TODO : ADD IN ROOM DB + REDIRECT TO BUS STATION
 
             CoroutineScope(Dispatchers.IO).launch {
                 userImageDao.insertImage(
                     UserImage(
                         0,
                         cameraViewModel.imageSrc.value.toString(),
-                        "title",
-                        "date",
-                        "location"
+                        name.text.toString(),
+                        getDateTimeInstance().format(Date()),
+                        ViewModelProvider(requireActivity()).get(SharedViewModel::class.java).selectedBusStation.value?.street_name!!
                     )
                 )
             }
             Toast.makeText(context, "Picture saved successfully.", Toast.LENGTH_SHORT).show()
 
             //navController.navigate(R.id.action_picture_to_bus_station)
+            navController.navigateUp()
+            navController.navigateUp()
         }
     }
 
