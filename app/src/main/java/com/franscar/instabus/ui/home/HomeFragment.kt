@@ -16,10 +16,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.franscar.instabus.R
 import com.franscar.instabus.data.BusStation
+import com.franscar.instabus.data.BusStationsRepository
 import com.franscar.instabus.data.BusStationsService
 import com.franscar.instabus.ui.shared.SharedViewModel
 import com.franscar.instabus.utilities.FileHelper
 import com.franscar.instabus.utilities.WEB_SERVICE_URL
+import com.franscar.instabus.utilities.refreshData
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -54,46 +56,37 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
         swipeLayout = root.findViewById(R.id.home_list_swipe_layout)
         swipeLayout.setOnRefreshListener {
             shimmer.showShimmer(true)
-            val busStationsData = MutableLiveData<List<BusStation>>()
 
             CoroutineScope(Dispatchers.IO).launch {
                 val moshi = Moshi.Builder()
                         .add(KotlinJsonAdapterFactory())
                         .build()
+
                 val retrofit = Retrofit.Builder()
                         .baseUrl(WEB_SERVICE_URL)
                         .addConverterFactory(MoshiConverterFactory.create(moshi))
                         .build()
+
                 val service = retrofit.create(BusStationsService::class.java)
                 val serviceData = service.getBusStationsData().body()?.data?.nearstations
-                Log.i("ResponseData", serviceData.toString())
-                busStationsData.postValue(serviceData ?: emptyList())
-                Log.i("BusStationsRepository", "PULLING_DATA_FROM_WEB")
+
+                homeViewModel.busStationsData.postValue(serviceData ?: emptyList())
 
                 if (serviceData != null) {
-                    val listType = Types.newParameterizedType(
-                        List::class.java,
-                        BusStation::class.java
-                    )
+                    val listType = Types.newParameterizedType(List::class.java, BusStation::class.java)
                     val adapter: JsonAdapter<List<BusStation>> = moshi.adapter(listType)
-
                     val json = adapter.toJson(serviceData)
-                    FileHelper.saveToTextFile(requireActivity().application, json)
-                    Log.i("BusStationsRepository", "SAVED_DATA_TO_CACHE")
+
+                    FileHelper.saveToTextFile(requireActivity().application, json) // Save data to cache
+
+                    withContext(Dispatchers.Main) {
+                        homeViewModel.busStationsData.observe(viewLifecycleOwner, {
+                            recyclerView.adapter = HomeRecyclerAdapter(requireContext(), it, HomeFragment())
+                            shimmer.hideShimmer()
+                        })
+                    }
                 }
                 swipeLayout.isRefreshing = false
-                withContext(Dispatchers.Main) { shimmer.hideShimmer() }
-
-//              val currentFragment = requireParentFragment().childFragmentManager.fragments
-//              // loop through list in case there are multiple fragments, even if it should only have one anyway
-//              for (fragment in currentFragment) {
-//                  if (fragment.toString().substringBefore('{') == "HomeFragment") {
-//                      val fragmentTransaction: FragmentTransaction = parentFragmentManager.beginTransaction()
-//                      fragmentTransaction.detach(fragment)
-//                      fragmentTransaction.attach(fragment)
-//                      fragmentTransaction.commit()
-//                  }
-//              }
             }
         }
 
