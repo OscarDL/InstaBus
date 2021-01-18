@@ -1,6 +1,5 @@
 package com.franscar.instabus.ui.picture
 
-import android.R.attr.*
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,8 +16,6 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.franscar.instabus.R
 import com.franscar.instabus.ui.camera.CameraViewModel
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-
 
 class PictureFragment : Fragment() {
 

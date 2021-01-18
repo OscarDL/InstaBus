@@ -3,11 +3,13 @@ package com.franscar.instabus.ui.camera
 // USING GOOGLE CAMERA X API
 
 import android.Manifest
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -24,7 +26,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
 
 class CameraFragment : Fragment() {
 
@@ -51,6 +52,8 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
         super.onViewCreated(root, savedInstanceState)
 
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
+
         if (allPermissionsGranted()) {
             startCamera(selectedCamera)
         } else {
@@ -61,6 +64,34 @@ class CameraFragment : Fragment() {
 
         camera_button.setOnClickListener { takePhoto() }
         flip_button.setOnClickListener { flipCamera(selectedCamera) }
+
+        orientationEventListener = object: OrientationEventListener(context) {
+            override fun onOrientationChanged(orientation: Int) {
+                // Monitors orientation values to determine the target rotation value
+                val rotation: Int
+                if (orientation in 45..134) {
+                    rotation = Surface.ROTATION_270
+                    root.findViewById<ImageButton>(R.id.flash_button).rotation = 270f
+                    root.findViewById<ImageButton>(R.id.flip_button).rotation = 270f
+                } else if (orientation in 135..224) {
+                    rotation = Surface.ROTATION_180
+                    root.findViewById<ImageButton>(R.id.flash_button).rotation = 180f
+                    root.findViewById<ImageButton>(R.id.flip_button).rotation = 180f
+                } else if (orientation in 225..314) {
+                    rotation = Surface.ROTATION_90
+                    root.findViewById<ImageButton>(R.id.flash_button).rotation = 90f
+                    root.findViewById<ImageButton>(R.id.flip_button).rotation = 90f
+                } else {
+                    rotation = Surface.ROTATION_0
+                    root.findViewById<ImageButton>(R.id.flash_button).rotation = 0f
+                    root.findViewById<ImageButton>(R.id.flip_button).rotation = 0f
+                }
+
+                imageCapture?.targetRotation = rotation
+            }
+        }
+
+        orientationEventListener.enable()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
@@ -161,25 +192,6 @@ class CameraFragment : Fragment() {
                 Log.e(TAG, "Use case binding failed", exc)
             }
 
-            orientationEventListener = object: OrientationEventListener(context) {
-                override fun onOrientationChanged(orientation: Int) {
-                    // Monitors orientation values to determine the target rotation value
-                    val rotation = if (orientation in 45..134) {
-                        Surface.ROTATION_270
-                    } else if (orientation in 135..224) {
-                        Surface.ROTATION_180
-                    } else if (orientation in 225..314) {
-                        Surface.ROTATION_90
-                    } else {
-                        Surface.ROTATION_0
-                    }
-
-                    imageCapture?.targetRotation = rotation
-                }
-            }
-
-            orientationEventListener.enable()
-
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
@@ -210,6 +222,8 @@ class CameraFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         cameraExecutor.shutdown()
+        orientationEventListener.disable()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
     }
 
     companion object {

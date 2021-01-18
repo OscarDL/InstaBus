@@ -35,8 +35,10 @@
         android:layout_width="match_parent"
         android:layout_marginHorizontal="50dp"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/accent_color"
         android:layout_above="@id/save_picture_button"
-        android:autofillHints="@string/picture_title"/>
+        android:autofillHints="@string/picture_title"
+        android:textCursorDrawable="@drawable/cursor_color"/>
 
     <Button
         android:radius="64dp"
