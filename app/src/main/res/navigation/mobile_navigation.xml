@@ -39,6 +39,9 @@
         <action
             android:id="@+id/action_bus_station_to_camera"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_bus_station_to_image"
+            app:destination="@id/cameraFragment" />
     </fragment>
 
     <fragment

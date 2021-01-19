@@ -36,7 +36,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
 
-    private lateinit var homeViewModel: SharedViewModel
+    private lateinit var sharedViewModel: SharedViewModel
     private lateinit var navController: NavController
 
     private lateinit var swipeLayout: SwipeRefreshLayout
@@ -48,7 +48,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        homeViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
 
         val shimmer = root.findViewById<ShimmerFrameLayout>(R.id.home_shimmer)
@@ -70,7 +70,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
                 val service = retrofit.create(BusStationsService::class.java)
                 val serviceData = service.getBusStationsData().body()?.data?.nearstations
 
-                homeViewModel.busStationsData.postValue(serviceData ?: emptyList())
+                sharedViewModel.busStationsData.postValue(serviceData ?: emptyList())
 
                 if (serviceData != null) {
                     val listType = Types.newParameterizedType(List::class.java, BusStation::class.java)
@@ -80,7 +80,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
                     FileHelper.saveToTextFile(requireActivity().application, json) // Save data to cache
 
                     withContext(Dispatchers.Main) {
-                        homeViewModel.busStationsData.observe(viewLifecycleOwner, {
+                        sharedViewModel.busStationsData.observe(viewLifecycleOwner, {
                             recyclerView.adapter = HomeRecyclerAdapter(requireContext(), it, HomeFragment())
                             shimmer.hideShimmer()
                         })
@@ -111,7 +111,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
             }
         ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)*/
 
-        homeViewModel.busStationsData.observe(viewLifecycleOwner, {
+        sharedViewModel.busStationsData.observe(viewLifecycleOwner, {
             recyclerView.adapter = HomeRecyclerAdapter(requireContext(), it, this)
             shimmer.hideShimmer()
         })
@@ -120,7 +120,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
     }
 
     override fun onBusStationItemClick(busStation: BusStation) {
-        homeViewModel.selectedBusStation.value = busStation
+        sharedViewModel.selectedBusStation.value = busStation
         navController.navigate(R.id.action_home_to_bus_station)
     }
 }

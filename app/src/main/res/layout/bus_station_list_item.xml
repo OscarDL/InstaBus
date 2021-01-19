@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_marginTop="10dp"
     android:id="@+id/card_view"
-    app:cardCornerRadius="2dp"
+    app:cardCornerRadius="5dp"
     android:clickable="true"
     android:focusable="true"
     android:padding="10dp">
@@ -21,20 +21,20 @@
 
         <ImageView
             android:contentDescription="@string/icon"
-            android:id="@+id/busStationImageIcon"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_bus_48dp"
             android:layout_marginBottom="10dp"
             android:layout_marginStart="10dp"
+            android:id="@+id/userImageIcon"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_height="48dp"
             android:layout_width="48dp" />
 
         <LinearLayout
-            android:layout_alignBottom="@id/busStationImageIcon"
-            android:layout_alignTop="@id/busStationImageIcon"
-            android:layout_toEndOf="@id/busStationImageIcon"
+            android:layout_alignBottom="@id/userImageIcon"
+            android:layout_alignTop="@id/userImageIcon"
+            android:layout_toEndOf="@id/userImageIcon"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="vertical">
@@ -43,20 +43,20 @@
                 app:layout_constraintEnd_toStartOf="parent"
                 app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:id="@+id/busStationImageName"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="10dp"
+                android:id="@+id/userImageName"
                 android:textSize="20sp"/>
 
             <TextView
                 app:layout_constraintEnd_toStartOf="parent"
                 app:layout_constraintStart_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:id="@+id/busStationImageDate"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="10dp"
+                android:id="@+id/userImageDate"
                 android:textSize="12sp" />
 
         </LinearLayout>
