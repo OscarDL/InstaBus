@@ -1,6 +1,7 @@
 package com.franscar.instabus.data.images
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.franscar.instabus.data.images.UserImage
@@ -15,4 +16,7 @@ interface UserImageDao {
 
     @Insert
     suspend fun insertImage(userImage: UserImage)
+
+    @Query("DELETE FROM userImages WHERE date = :date")
+    suspend fun deleteImage(date: String)
 }

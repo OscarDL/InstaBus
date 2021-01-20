@@ -1,7 +1,8 @@
 package com.franscar.instabus.ui.bus_station
 
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.franscar.instabus.MainActivity
@@ -48,7 +50,7 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
             (activity as MainActivity).supportActionBar?.title = it.street_name
         })
 
-        recyclerView.adapter = EmptyHomeRecyclerAdapter(requireContext())
+        recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), emptyList(), this)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         return root
@@ -56,13 +58,37 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
 
     override fun onResume() {
         super.onResume()
-        CoroutineScope(Dispatchers.IO).launch {
-            getImages()
-        }
+
+        // Bad workaround, bus station images data sometimes randomly doesn't refresh on the UI
+        Handler(Looper.getMainLooper()).postDelayed({
+            CoroutineScope(Dispatchers.IO).launch {
+                getImages()
+            }
+        }, 100)
 
         userImagesData.observe(viewLifecycleOwner, {
             recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), it, this)
         })
+
+        // SWIPE CARD TO LEFT
+        /*val itemTouchHelperCallback: ItemTouchHelper.SimpleCallback =
+            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean { return false }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, position: Int) {
+                    userImagesData = MutableLiveData((BusStationsRecyclerAdapter(requireContext(), userImagesData.value!!, BusStationFragment())).removeItem(viewHolder))
+
+                    userImagesData.observe(viewLifecycleOwner, {
+                        recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), it, BusStationFragment())
+                    })
+                }
+            }
+        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)*/
     }
 
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
@@ -79,7 +105,8 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onUserImageItemClick() {
+    override fun onUserImageItemClick(userImage: UserImage) {
+        sharedViewModel.selectedImage.value = userImage
         navController.navigate(R.id.action_bus_station_to_image)
     }
 

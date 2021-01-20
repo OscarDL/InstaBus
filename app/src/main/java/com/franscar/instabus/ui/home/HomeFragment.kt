@@ -90,26 +90,9 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
             }
         }
 
-        // Show empty recyclerView until data is loaded
+        // Show empty recyclerView until data is loaded for shimmer effect
         recyclerView.adapter = EmptyHomeRecyclerAdapter(requireContext())
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        // SWIPE CARD TO LEFT
-        /*val itemTouchHelperCallback: ItemTouchHelper.SimpleCallback =
-            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    return false
-                }
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    // Row is swiped from recycler view
-                    // remove it from adapter
-                }
-            }
-        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)*/
 
         sharedViewModel.busStationsData.observe(viewLifecycleOwner, {
             recyclerView.adapter = HomeRecyclerAdapter(requireContext(), it, this)

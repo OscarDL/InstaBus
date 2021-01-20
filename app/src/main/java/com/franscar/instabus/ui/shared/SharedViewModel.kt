@@ -10,5 +10,5 @@ import com.franscar.instabus.data.images.UserImage
 class SharedViewModel(app: Application) : AndroidViewModel(app) {
     val busStationsData = BusStationsRepository(app).busStationsData
     val selectedBusStation = MutableLiveData<BusStation>()
-    var pictureTaken: UserImage? = null
+    val selectedImage = MutableLiveData<UserImage>()
 }

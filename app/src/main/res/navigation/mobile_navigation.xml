@@ -41,7 +41,7 @@
             app:destination="@id/cameraFragment" />
         <action
             android:id="@+id/action_bus_station_to_image"
-            app:destination="@id/cameraFragment" />
+            app:destination="@id/imageFragment" />
     </fragment>
 
     <fragment
@@ -61,6 +61,16 @@
         tools:layout="@layout/fragment_picture">
         <action
             android:id="@+id/action_picture_to_bus_station"
+            app:destination="@id/busStationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/imageFragment"
+        android:name="com.franscar.instabus.ui.image.ImageFragment"
+        android:label="Image"
+        tools:layout="@layout/fragment_picture">
+        <action
+            android:id="@+id/action_image_to_bus_station"
             app:destination="@id/busStationFragment" />
     </fragment>
 

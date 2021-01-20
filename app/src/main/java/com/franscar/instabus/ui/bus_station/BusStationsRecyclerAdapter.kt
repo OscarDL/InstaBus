@@ -2,6 +2,7 @@ package com.franscar.instabus.ui.bus_station
 
 import android.content.Context
 import android.content.res.Configuration
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,10 +36,26 @@ class BusStationsRecyclerAdapter(
             }
 
             holder.itemView.setOnClickListener {
-                itemListener.onUserImageItemClick()
+                itemListener.onUserImageItemClick(userImage)
             }
         }
     }
+
+    /*fun removeItem(viewHolder: RecyclerView.ViewHolder): List<UserImage>? {
+        val newUserImageList: MutableList<UserImage>? = null
+
+        for ((index, userImage) in userImages.withIndex()) {
+            Log.i("SWIPED", index.toString() + " - " + viewHolder.adapterPosition + userImage)
+            if (index != viewHolder.adapterPosition) {
+                newUserImageList?.add(index, userImage)
+                Log.i("ADDED", userImage.toString())
+            } else {
+                notifyItemRemoved(viewHolder.adapterPosition)
+            }
+        }
+
+        return newUserImageList ?: emptyList()
+    }*/
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val userImageIcon: ImageView = itemView.findViewById(R.id.userImageIcon)
@@ -47,6 +64,6 @@ class BusStationsRecyclerAdapter(
     }
 
     interface UserImagesItemListener {
-        fun onUserImageItemClick()
+        fun onUserImageItemClick(userImage: UserImage)
     }
 }

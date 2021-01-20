@@ -52,7 +52,7 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
         super.onViewCreated(root, savedInstanceState)
 
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         if (allPermissionsGranted()) {
             startCamera(selectedCamera)
@@ -223,7 +223,7 @@ class CameraFragment : Fragment() {
         super.onDestroyView()
         cameraExecutor.shutdown()
         orientationEventListener.disable()
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
     }
 
     companion object {
