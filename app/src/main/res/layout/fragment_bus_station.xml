@@ -15,10 +15,11 @@
         <androidx.recyclerview.widget.RecyclerView
             tools:listitem="@layout/bus_station_list_item"
             android:id="@+id/bus_station_recycler_view"
+            android:layout_marginHorizontal="10dp"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="12dp"/>
+            android:paddingVertical="5dp"
+            android:clipToPadding="false"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             app:tint="@color/white"

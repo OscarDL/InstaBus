@@ -24,9 +24,7 @@ import com.franscar.instabus.data.images.UserImage
 import com.franscar.instabus.data.images.UserImageDatabase
 import com.franscar.instabus.ui.camera.CameraViewModel
 import com.franscar.instabus.ui.shared.SharedViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.text.DateFormat.*
 import java.util.*
 
@@ -73,17 +71,24 @@ class PictureFragment : Fragment() {
 
         root.findViewById<Button>(R.id.save_picture_button).setOnClickListener {
 
-            CoroutineScope(Dispatchers.IO).launch {
-                userImageDao.insertImage(
-                    UserImage(
-                        0,
-                        cameraViewModel.imageSrc.value.toString(),
-                        name.text.toString(),
-                        getDateInstance().format(Date()) + " - " + getTimeInstance().format(Date()),
-                        ViewModelProvider(requireActivity()).get(SharedViewModel::class.java).selectedBusStation.value?.street_name!!
+            sharedViewModel.canGetImages = false
+
+            runBlocking {
+                val job: Job = launch(context = Dispatchers.IO) {
+                    userImageDao.insertImage(
+                        UserImage(
+                            0,
+                            cameraViewModel.imageSrc.value.toString(),
+                            name.text.toString(),
+                            getDateInstance().format(Date()) + " - " + getTimeInstance().format(Date()),
+                            ViewModelProvider(requireActivity()).get(SharedViewModel::class.java).selectedBusStation.value?.street_name!!
+                        )
                     )
-                )
+                }
+                job.join()
+                sharedViewModel.canGetImages = true
             }
+
             Toast.makeText(context, "Picture saved successfully.", Toast.LENGTH_SHORT).show()
 
             view?.let {

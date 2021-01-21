@@ -81,7 +81,7 @@ class HomeFragment : Fragment(), HomeRecyclerAdapter.BusStationsItemListener {
 
                     withContext(Dispatchers.Main) {
                         sharedViewModel.busStationsData.observe(viewLifecycleOwner, {
-                            recyclerView.adapter = HomeRecyclerAdapter(requireContext(), it, HomeFragment())
+                            recyclerView.adapter = HomeRecyclerAdapter(requireContext(), it, this@HomeFragment)
                             shimmer.hideShimmer()
                         })
                     }

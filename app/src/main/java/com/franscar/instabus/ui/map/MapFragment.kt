@@ -55,13 +55,14 @@ class MapFragment : Fragment() {
         map.setMultiTouchControls(true)
         map.setUseDataConnection(true)
         map.overlays.add(rotationGestures)
-
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
 
         val gPoint = GeoPoint(41.3985182, 2.1917991)
 
         if(refreshMap) {
+            map.minZoomLevel = 3.5
+            map.maxZoomLevel = 21.0
             map.controller.setZoom(5.0)
             map.controller.setCenter(GeoPoint(40.9, 1.7))
             Handler(Looper.getMainLooper()).postDelayed({

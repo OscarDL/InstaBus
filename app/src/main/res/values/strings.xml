@@ -28,4 +28,5 @@
     <string name="taken_on">Taken on: %1$s</string>
     <string name="image">Image</string>
     <string name="image_date">Image date</string>
+    <string name="no_picture">Could not find your picture.</string>
 </resources>

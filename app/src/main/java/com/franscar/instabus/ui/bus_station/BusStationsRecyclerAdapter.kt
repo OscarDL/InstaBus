@@ -1,8 +1,8 @@
 package com.franscar.instabus.ui.bus_station
 
+import android.content.ClipData.Item
 import android.content.Context
 import android.content.res.Configuration
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +12,15 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.franscar.instabus.R
 import com.franscar.instabus.data.images.UserImage
+import com.google.android.material.snackbar.Snackbar
+
 
 class BusStationsRecyclerAdapter(
-    private val context: Context, private val userImages: List<UserImage>, private val itemListener:
-  UserImagesItemListener): RecyclerView.Adapter<BusStationsRecyclerAdapter.ViewHolder>() {
+        private val context: Context, private val userImages: MutableList<UserImage>, private val itemListener:
+        UserImagesItemListener): RecyclerView.Adapter<BusStationsRecyclerAdapter.ViewHolder>() {
+
+    private var removedPosition: Int = 0
+    private lateinit var removedItem: UserImage
 
     override fun getItemCount() = userImages.size
 
@@ -41,21 +46,18 @@ class BusStationsRecyclerAdapter(
         }
     }
 
-    /*fun removeItem(viewHolder: RecyclerView.ViewHolder): List<UserImage>? {
-        val newUserImageList: MutableList<UserImage>? = null
+    fun removeItem(position: Int) {
+        removedPosition = position
+        removedItem = userImages[position]
 
-        for ((index, userImage) in userImages.withIndex()) {
-            Log.i("SWIPED", index.toString() + " - " + viewHolder.adapterPosition + userImage)
-            if (index != viewHolder.adapterPosition) {
-                newUserImageList?.add(index, userImage)
-                Log.i("ADDED", userImage.toString())
-            } else {
-                notifyItemRemoved(viewHolder.adapterPosition)
-            }
-        }
+        userImages.removeAt(position)
+        notifyItemRemoved(position)
+    }
 
-        return newUserImageList ?: emptyList()
-    }*/
+    fun restoreItem(position: Int, userImage: UserImage) {
+        userImages.add(position, userImage)
+        notifyItemInserted(position)
+    }
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val userImageIcon: ImageView = itemView.findViewById(R.id.userImageIcon)

@@ -1,5 +1,6 @@
 package com.franscar.instabus.ui.image
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -26,6 +27,7 @@ import com.franscar.instabus.ui.shared.SharedViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.DateFormat
 import java.util.*
 
@@ -46,20 +48,25 @@ class ImageFragment : Fragment() {
         })
 
         val image = root.findViewById<ImageView>(R.id.image)
-        image.setImageBitmap(BitmapFactory.decodeFile((sharedViewModel.selectedImage.value?.image)))
 
-        root.findViewById<TextView>(R.id.image_date).text =
-            String.format(resources.getString(R.string.taken_on), sharedViewModel.selectedImage.value?.date)
+        if (File(sharedViewModel.selectedImage.value?.image!!).exists()) {
+            image.setImageBitmap(BitmapFactory.decodeFile((sharedViewModel.selectedImage.value?.image)))
 
-        //TODO: FIX ROTATION ISSUE, UNDER SHOULD NOT BE NECESSARY AND CREATES LAYOUT BOUND ISSUES
+            //TODO: FIX ROTATION ISSUE, UNDER SHOULD NOT BE NECESSARY AND CREATES LAYOUT BOUND ISSUES
 
-        when (ExifInterface(sharedViewModel.selectedImage.value?.image!!).getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )) {
-            ExifInterface.ORIENTATION_ROTATE_270 -> image.rotation = 270f
-            ExifInterface.ORIENTATION_ROTATE_180 -> image.rotation = 180f
-            ExifInterface.ORIENTATION_ROTATE_90 -> image.rotation = 90f
+            when (ExifInterface(sharedViewModel.selectedImage.value?.image!!).getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            )) {
+                ExifInterface.ORIENTATION_ROTATE_270 -> image.rotation = 270f
+                ExifInterface.ORIENTATION_ROTATE_180 -> image.rotation = 180f
+                ExifInterface.ORIENTATION_ROTATE_90 -> image.rotation = 90f
+            }
+
+            root.findViewById<TextView>(R.id.image_date).text =
+                    String.format(resources.getString(R.string.taken_on), sharedViewModel.selectedImage.value?.date)
+        } else {
+            root.findViewById<TextView>(R.id.image_date).text = String.format(resources.getString(R.string.no_picture))
         }
 
         return root
@@ -70,12 +77,21 @@ class ImageFragment : Fragment() {
         val userImageDao = UserImageDatabase.getDatabase(requireContext()).userImageDao()
 
         root.findViewById<Button>(R.id.delete_image_button).setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                userImageDao.deleteImage(sharedViewModel.selectedImage.value?.date!!)
-            }
-
-            Toast.makeText(context, "Picture successfully deleted.", Toast.LENGTH_SHORT).show()
-            navController.navigateUp()
+            AlertDialog.Builder(requireContext())
+                .setTitle("Confirmation")
+                .setMessage("Do you really want to delete this picture?")
+                .setPositiveButton(" DELETE ") { _, _ ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userImageDao.deleteImage(sharedViewModel.selectedImage.value!!.date)
+                        if(File(sharedViewModel.selectedImage.value!!.image).exists())
+                            File(sharedViewModel.selectedImage.value!!.image).delete()
+                    }
+                    Toast.makeText(context, "Picture successfully deleted.", Toast.LENGTH_SHORT).show()
+                    navController.navigateUp()
+                }
+                .setNegativeButton(" CANCEL ") { _, _ -> }
+                .create()
+                .show()
         }
     }
 

@@ -11,4 +11,5 @@ class SharedViewModel(app: Application) : AndroidViewModel(app) {
     val busStationsData = BusStationsRepository(app).busStationsData
     val selectedBusStation = MutableLiveData<BusStation>()
     val selectedImage = MutableLiveData<UserImage>()
+    var canGetImages = true
 }
