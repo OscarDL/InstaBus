@@ -1,11 +1,9 @@
 package com.franscar.instabus.ui.bus_station
 
-import android.R.attr.endColor
-import android.R.attr.startColor
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,9 +11,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.WorkerThread
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -27,13 +25,11 @@ import com.franscar.instabus.R
 import com.franscar.instabus.data.images.UserImage
 import com.franscar.instabus.data.images.UserImageDao
 import com.franscar.instabus.data.images.UserImageDatabase
-import com.franscar.instabus.ui.home.EmptyHomeRecyclerAdapter
 import com.franscar.instabus.ui.shared.SharedViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import java.io.File
-
 
 class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItemListener {
 
@@ -42,17 +38,24 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
     private lateinit var navController: NavController
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var swipeBackgroundColor: ColorDrawable
+    private lateinit var userImagesData: MutableList<UserImage>
     private lateinit var busStationAdapter: BusStationsRecyclerAdapter
-
-    var userImagesData = MutableLiveData<List<UserImage>>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root = inflater.inflate(R.layout.fragment_bus_station, container, false)
-        userImageDao = UserImageDatabase.getDatabase(requireContext()).userImageDao()
-
         setHasOptionsMenu(true)
+
+        // For fragment transition animation
+        if (requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO) {
+            root.findViewById<ConstraintLayout>(R.id.bus_station_fragment).setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        }
+
+        userImagesData = mutableListOf()
         recyclerView = root.findViewById(R.id.bus_station_recycler_view)
-        swipeBackgroundColor = ColorDrawable(Color.parseColor("#FF709DE0"))
+        swipeBackgroundColor = ColorDrawable(Color.parseColor("#FFEA4235")) // "#FF709DE0"
+        userImageDao = UserImageDatabase.getDatabase(requireContext()).userImageDao()
+        busStationAdapter = BusStationsRecyclerAdapter(requireContext(), userImagesData, this)
+
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
@@ -60,8 +63,7 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
             (activity as MainActivity).supportActionBar?.title = it.street_name
         })
 
-        recyclerView.adapter = EmptyHomeRecyclerAdapter(requireContext())
-            //BusStationsRecyclerAdapter(requireContext(), mutableListOf(), this)
+        recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), userImagesData, this)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         return root
@@ -69,20 +71,7 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
 
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
         super.onViewCreated(root, savedInstanceState)
-        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)
-        root.findViewById<FloatingActionButton>(R.id.add_photo).setOnClickListener {
-            navController.navigate(R.id.action_bus_station_to_camera)
-        }
-    }
 
-    override fun onResume() {
-        super.onResume()
-        /** Issue: image card sometimes randomly doesn't appear after taking picture
-            (Gets images before new image was inserted into the local room database)
-
-            This runBlocking tries to get new image after it was inserted, but can't
-            confirm it works because I'm not able to reproduce the issue anymore...?
-        */
         runBlocking {
             val job: Job = launch(context = Dispatchers.IO) {
                 while (!sharedViewModel.canGetImages) {
@@ -90,15 +79,17 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
                 }
                 getImages()
             }
-            job.join()
-            userImagesData.observe(viewLifecycleOwner, {
-                recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), it as MutableList<UserImage>, this@BusStationFragment)
-                busStationAdapter = BusStationsRecyclerAdapter(requireContext(), it, this@BusStationFragment)
-            })
+            job.join() // Use job.join() to refresh UI only when data is actually updated
+            recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), userImagesData, this@BusStationFragment)
+        }
+
+        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)
+
+        root.findViewById<FloatingActionButton>(R.id.add_picture).setOnClickListener {
+            navController.navigate(R.id.action_bus_station_to_camera)
         }
     }
 
-    // SWIPE CARD TO LEFT
     private val itemTouchHelperCallback: ItemTouchHelper.SimpleCallback =
         object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
@@ -110,7 +101,7 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, position: Int) {
             val realPosition = viewHolder.adapterPosition
-            val swipedItem = userImagesData.value!![realPosition]
+            val swipedItem = userImagesData[realPosition]
 
             busStationAdapter.removeItem(realPosition)
 
@@ -141,33 +132,33 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
                 actionState: Int,
                 isCurrentlyActive: Boolean
         ) {
-            val deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete_24px)!!
+            val deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete_24dp)!!
             val iconMargin = (viewHolder.itemView.height - deleteIcon.intrinsicHeight) / 2
             if (dX > 0) {
                 swipeBackgroundColor.setBounds(
-                    viewHolder.itemView.left + 0,
-                    viewHolder.itemView.top + 0,
-                    dX.toInt() + 0,
-                    viewHolder.itemView.bottom + 0
+                        viewHolder.itemView.left + 0,
+                        viewHolder.itemView.top + 0,
+                        dX.toInt() + 0,
+                        viewHolder.itemView.bottom + 0
                 )
                 deleteIcon.setBounds(
-                    viewHolder.itemView.left + iconMargin,
-                    viewHolder.itemView.top + iconMargin,
-                    viewHolder.itemView.left + iconMargin + deleteIcon.intrinsicWidth,
-                    viewHolder.itemView.bottom - iconMargin
+                        viewHolder.itemView.left + iconMargin,
+                        viewHolder.itemView.top + iconMargin,
+                        viewHolder.itemView.left + iconMargin + deleteIcon.intrinsicWidth,
+                        viewHolder.itemView.bottom - iconMargin
                 )
             } else if (dX < 0) {
                 swipeBackgroundColor.setBounds(
-                    viewHolder.itemView.left + dX.toInt(),
-                    viewHolder.itemView.top + 0,
-                    viewHolder.itemView.right + 0,
-                    viewHolder.itemView.bottom + 0
+                        viewHolder.itemView.left + dX.toInt(),
+                        viewHolder.itemView.top + 0,
+                        viewHolder.itemView.right + 0,
+                        viewHolder.itemView.bottom + 0
                 )
                 deleteIcon.setBounds(
-                    viewHolder.itemView.right - iconMargin - deleteIcon.intrinsicWidth,
-                    viewHolder.itemView.top + iconMargin,
-                    viewHolder.itemView.right - iconMargin,
-                    viewHolder.itemView.bottom - iconMargin
+                        viewHolder.itemView.right - iconMargin - deleteIcon.intrinsicWidth,
+                        viewHolder.itemView.top + iconMargin,
+                        viewHolder.itemView.right - iconMargin,
+                        viewHolder.itemView.bottom - iconMargin
                 )
             } else {
                 swipeBackgroundColor.setBounds(0, 0, 0, 0)
@@ -178,17 +169,17 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
 
             if (dX > 0) {
                 c.clipRect(
-                    viewHolder.itemView.left + 0,
-                    viewHolder.itemView.top + 0,
-                    dX.toInt() + 0,
-                    viewHolder.itemView.bottom + 0
+                        viewHolder.itemView.left + 0,
+                        viewHolder.itemView.top + 0,
+                        dX.toInt() + 0,
+                        viewHolder.itemView.bottom + 0
                 )
             } else {
                 c.clipRect(
-                    viewHolder.itemView.left + dX.toInt(),
-                    viewHolder.itemView.top + 0,
-                    viewHolder.itemView.right + 0,
-                    viewHolder.itemView.bottom + 0
+                        viewHolder.itemView.left + dX.toInt(),
+                        viewHolder.itemView.top + 0,
+                        viewHolder.itemView.right + 0,
+                        viewHolder.itemView.bottom + 0
                 )
             }
 
@@ -222,30 +213,15 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
                 }
             }
             job.join() // Use job.join() to refresh UI only when data is actually updated
-            userImagesData.observe(viewLifecycleOwner, {
-                recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(),
-                        it as MutableList<UserImage>, this@BusStationFragment)
-            })
+            recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), userImagesData, this@BusStationFragment)
         }
-        /*CoroutineScope(Dispatchers.IO).launch {
-            if (insert) {
-                userImageDao.insertImage(image)
-            } else {
-                userImageDao.deleteImage(image.date)
-            }
-
-            // Use Dispatcher to refresh UI only when data is actually updated
-            withContext(Dispatchers.Main) {
-                userImagesData.observe(viewLifecycleOwner, {
-                    recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), it as MutableList<UserImage>, this@BusStationFragment)
-                })
-            }
-        }*/
     }
 
     @WorkerThread
     private fun getImages() {
         val data = userImageDao.getImages(sharedViewModel.selectedBusStation.value?.street_name!!)
-        userImagesData.postValue(data)
+        for (image in data) {
+            userImagesData.add(image)
+        }
     }
 }

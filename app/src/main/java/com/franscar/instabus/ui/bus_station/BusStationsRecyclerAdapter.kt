@@ -1,8 +1,11 @@
 package com.franscar.instabus.ui.bus_station
 
-import android.content.ClipData.Item
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +13,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.Transformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.franscar.instabus.R
 import com.franscar.instabus.data.images.UserImage
-import com.google.android.material.snackbar.Snackbar
+import java.io.File
 
 
 class BusStationsRecyclerAdapter(
@@ -37,8 +44,17 @@ class BusStationsRecyclerAdapter(
             userImageDate.text = userImage.date
 
             if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO) {
-                userImageIcon.setColorFilter(ContextCompat.getColor(context, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN)
+                userImageName.setTextColor(ContextCompat.getColor(context, R.color.black))
             }
+
+            Glide.with(holder.itemView.context)
+                .load(File(userImage.image))
+                .transform(CenterCrop(context))
+                .into(holder.userImageIcon)
+
+            /*if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO)
+                userImageIcon.setColorFilter(ContextCompat.getColor(context, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN)
+            */
 
             holder.itemView.setOnClickListener {
                 itemListener.onUserImageItemClick(userImage)
@@ -47,9 +63,6 @@ class BusStationsRecyclerAdapter(
     }
 
     fun removeItem(position: Int) {
-        removedPosition = position
-        removedItem = userImages[position]
-
         userImages.removeAt(position)
         notifyItemRemoved(position)
     }
@@ -57,6 +70,27 @@ class BusStationsRecyclerAdapter(
     fun restoreItem(position: Int, userImage: UserImage) {
         userImages.add(position, userImage)
         notifyItemInserted(position)
+    }
+
+    private fun rotate(bitmap: Bitmap, degrees: Int): Bitmap {
+        var image = bitmap
+        if (degrees != 0) {
+            val matrix = Matrix()
+            matrix.setRotate(
+                    degrees.toFloat(),
+                    image.width.toFloat() / 2,
+                    image.height.toFloat() / 2
+            )
+            val newImage = Bitmap.createBitmap(
+                    image, 0, 0, image.width,
+                    image.height, matrix, true
+            )
+            if (image != newImage) {
+                image.recycle()
+                image = newImage
+            }
+        }
+        return image
     }
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

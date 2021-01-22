@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_home_to_bus_station"
-            app:destination="@id/busStationFragment" />
+            app:destination="@id/busStationFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
     </fragment>
 
     <fragment
@@ -23,7 +27,11 @@
         <action
             android:id="@+id/action_map_to_bus_station"
             android:label="@string/title_map"
-            app:destination="@id/busStationFragment" />
+            app:destination="@id/busStationFragment"
+            app:popEnterAnim="@anim/slide_in_top"
+            app:popExitAnim="@anim/slide_out_bottom"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_top"/>
     </fragment>
 
     <fragment
@@ -38,10 +46,18 @@
         tools:layout="@layout/fragment_bus_station" >
         <action
             android:id="@+id/action_bus_station_to_camera"
-            app:destination="@id/cameraFragment" />
+            app:destination="@id/cameraFragment"
+            app:popEnterAnim="@anim/slide_in_top"
+            app:popExitAnim="@anim/slide_out_bottom"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_top"/>
         <action
             android:id="@+id/action_bus_station_to_image"
-            app:destination="@id/imageFragment" />
+            app:destination="@id/imageFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
     </fragment>
 
     <fragment
@@ -51,7 +67,11 @@
         tools:layout="@layout/fragment_camera" >
         <action
             android:id="@+id/action_camera_to_picture"
-            app:destination="@id/pictureFragment" />
+            app:destination="@id/pictureFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
     </fragment>
 
     <fragment
@@ -71,7 +91,11 @@
         tools:layout="@layout/fragment_picture">
         <action
             android:id="@+id/action_image_to_bus_station"
-            app:destination="@id/busStationFragment" />
+            app:destination="@id/busStationFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
     </fragment>
 
 </navigation>

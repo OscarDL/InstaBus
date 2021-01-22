@@ -34,7 +34,7 @@ class EmptyHomeRecyclerAdapter(private val context: Context): RecyclerView.Adapt
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.title.text = null
         holder.desc.text = null
-        holder.icon.setImageResource(R.drawable.ic_bus_48dp)
+        holder.icon.setImageResource(R.drawable.ic_bus_56dp)
 
         if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO) {
             holder.icon.setColorFilter(ContextCompat.getColor(context, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN)

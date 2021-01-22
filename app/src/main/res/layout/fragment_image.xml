@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:id="@+id/image_fragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#FF141414">
 
     <ImageView
         android:id="@+id/image"

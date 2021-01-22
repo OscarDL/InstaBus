@@ -2,7 +2,10 @@ package com.franscar.instabus.ui.image
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,15 +13,14 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
+import com.bumptech.glide.Glide
 import com.franscar.instabus.MainActivity
 import com.franscar.instabus.R
 import com.franscar.instabus.data.images.UserImage
@@ -38,30 +40,37 @@ class ImageFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.fragment_image, container, false)
-
         setHasOptionsMenu(true)
+
+        if (requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO) {
+            root.findViewById<RelativeLayout>(R.id.image_fragment).setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+        }
+
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
         sharedViewModel.selectedImage.observe(viewLifecycleOwner, {
-            (activity as MainActivity).supportActionBar?.title = it.title
+            (activity as MainActivity).supportActionBar!!.title = it.title
         })
 
         val image = root.findViewById<ImageView>(R.id.image)
 
-        if (File(sharedViewModel.selectedImage.value?.image!!).exists()) {
-            image.setImageBitmap(BitmapFactory.decodeFile((sharedViewModel.selectedImage.value?.image)))
+        if (File(sharedViewModel.selectedImage.value!!.image).exists()) {
 
-            //TODO: FIX ROTATION ISSUE, UNDER SHOULD NOT BE NECESSARY AND CREATES LAYOUT BOUND ISSUES
-
-            when (ExifInterface(sharedViewModel.selectedImage.value?.image!!).getAttributeInt(
+            var rotation = 0
+            when (ExifInterface(sharedViewModel.selectedImage.value!!.image).getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_NORMAL
             )) {
-                ExifInterface.ORIENTATION_ROTATE_270 -> image.rotation = 270f
-                ExifInterface.ORIENTATION_ROTATE_180 -> image.rotation = 180f
-                ExifInterface.ORIENTATION_ROTATE_90 -> image.rotation = 90f
+                ExifInterface.ORIENTATION_ROTATE_270 -> rotation = 270
+                ExifInterface.ORIENTATION_ROTATE_180 -> rotation = 180
+                ExifInterface.ORIENTATION_ROTATE_90 -> rotation = 90
             }
+
+            image.setImageBitmap(rotate(BitmapFactory.decodeFile(sharedViewModel.selectedImage.value!!.image), rotation))
+
+            // Doesn't need fancy bitmap rotation function, but loads the image really slow (about a second) ?
+            // Glide.with(context).load(File(sharedViewModel.selectedImage.value!!.image)).crossFade().into(image)
 
             root.findViewById<TextView>(R.id.image_date).text =
                     String.format(resources.getString(R.string.taken_on), sharedViewModel.selectedImage.value?.date)
@@ -70,6 +79,31 @@ class ImageFragment : Fragment() {
         }
 
         return root
+    }
+
+    private fun rotate(bitmap: Bitmap, degrees: Int): Bitmap {
+        var image = bitmap
+        if (degrees != 0) {
+            val matrix = Matrix()
+            matrix.setRotate(
+                    degrees.toFloat(),
+                    image.width.toFloat() / 2,
+                    image.height.toFloat() / 2
+            )
+            try {
+                val newImage = Bitmap.createBitmap(
+                        image, 0, 0, image.width,
+                        image.height, matrix, true
+                )
+                if (image != newImage) {
+                    image.recycle()
+                    image = newImage
+                }
+            } catch (ex: OutOfMemoryError) {
+                throw ex
+            }
+        }
+        return image
     }
 
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {

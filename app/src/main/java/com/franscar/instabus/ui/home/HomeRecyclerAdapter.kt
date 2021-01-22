@@ -32,6 +32,10 @@ class HomeRecyclerAdapter(
             busStationDistance.text = "${((busStation.distance * 1000).toInt()).toString().replaceFirst("^0+", "")}m away"
 
             if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO) {
+                busStationStreet.setTextColor(ContextCompat.getColor(context, R.color.black))
+            }
+
+            if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO) {
                 busStationIcon.setColorFilter(ContextCompat.getColor(context, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN)
             }
 
