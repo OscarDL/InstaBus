@@ -11,8 +11,12 @@ interface UserImageDao {
     @Query("SELECT * FROM userImages")
     fun getAll(): List<UserImage>
 
-    @Query("SELECT * FROM userImages WHERE station = :station ORDER BY imageId DESC")
-    fun getImages(station: String): List<UserImage>
+    @Query("SELECT * FROM userImages WHERE station = :station ORDER BY " +
+            "CASE WHEN :sorting = 0 THEN imageId END ASC, " +
+            "CASE WHEN :sorting = 1 THEN imageId END DESC, " +
+            "CASE WHEN :sorting = 2 THEN title END ASC, " +
+            "CASE WHEN :sorting = 3 THEN title END DESC")
+    fun getImages(station: String, sorting: Int): List<UserImage>
 
     @Insert
     suspend fun insertImage(userImage: UserImage)

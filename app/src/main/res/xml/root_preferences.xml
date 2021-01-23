@@ -6,6 +6,7 @@
         app:title="@string/pictures">
 
         <SwitchPreference
+            app:defaultValue="false"
             app:key="enable_pictures_grid"
             app:title="@string/display_pictures_as_grid"/>
 
@@ -18,15 +19,23 @@
             app:dependency="enable_pictures_grid"
             app:title="@string/number_of_columns_per_row"/>
 
-        <SwitchPreference
-            app:enabled="true"
-            app:singleLineTitle="true"
-            app:key="enable_swipe_to_delete"
-            app:summary="Only works in list view."
-            app:title="@string/enable_swipe_to_delete"/>
+        <ListPreference
+            app:defaultValue="1"
+            app:useSimpleSummaryProvider="true"
+            app:key="preferred_pictures_sorting"
+            app:entries="@array/sorting_entries"
+            app:entryValues="@array/sorting_values"
+            app:title="@string/preferred_pictures_sorting"/>
 
         <SwitchPreference
-            app:enabled="true"
+            app:defaultValue="true"
+            app:singleLineTitle="true"
+            app:key="enable_swipe_to_delete"
+            app:title="@string/enable_swipe_to_delete"
+            app:summary="Only works in list view."/>
+
+        <SwitchPreference
+            app:defaultValue="true"
             app:key="delete_confirmation_prompt"
             app:title="@string/confirm_picture_deletion"
             app:summary="Show prompt before deleting a picture."
@@ -37,15 +46,24 @@
     <PreferenceCategory
         app:title="@string/map">
 
+        <!--
         <SwitchPreference
-            app:enabled="true"
+            app:defaultValue="true"
             app:key="enable_location"
             app:title="@string/enable_location"/>
+        -->
 
         <SwitchPreference
-            app:enabled="true"
+            app:defaultValue="true"
+            app:key="enable_start_animation"
+            app:title="@string/enable_start_animation"/>
+
+        <SwitchPreference
+            app:defaultValue="true"
             app:key="enable_multi_touch_rotation"
-            app:title="@string/enable_multi_touch_rotation"/>
+            app:title="@string/enable_multi_touch_rotation"
+            app:summaryOn="You can use 2 fingers to rotate the map."
+            app:summaryOff="You will not be able to rotate the map."/>
 
         <SeekBarPreference
             app:min="4"

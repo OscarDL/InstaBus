@@ -58,4 +58,6 @@
     <string name="enable_location">Enable location</string>
     <string name="enable_multi_touch_rotation">Enable multi-touch rotation</string>
     <string name="enable_swipe_to_delete">Swipe to delete picture</string>
+    <string name="enable_start_animation">Enable starting animation</string>
+    <string name="preferred_pictures_sorting">Preferred pictures sorting</string>
 </resources>

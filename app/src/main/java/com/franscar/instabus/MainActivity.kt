@@ -19,27 +19,9 @@ import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-    private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            AlertDialog.Builder(this)
-                .setTitle("Location Access Request")
-                .setMessage("Enabling in-app location will help you know where and how far the bus stations are relative to you.")
-                .setPositiveButton("ACCEPT") { _, _ ->
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-                }
-                .setNegativeButton("DENY") { _, _ ->
-                    // DO SOMETHING IF NECESSARY
-                }
-                .create()
-                .show()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        checkLocationPermission()
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)

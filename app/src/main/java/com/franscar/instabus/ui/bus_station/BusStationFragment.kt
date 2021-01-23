@@ -1,5 +1,6 @@
 package com.franscar.instabus.ui.bus_station
 
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
@@ -13,10 +14,13 @@ import android.view.ViewGroup
 import androidx.annotation.WorkerThread
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginStart
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,6 +37,7 @@ import java.io.File
 
 class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItemListener {
 
+    private lateinit var prefs: SharedPreferences
     private lateinit var userImageDao: UserImageDao
     private lateinit var recyclerView: RecyclerView
     private lateinit var navController: NavController
@@ -51,9 +56,11 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
         }
 
         userImagesData = mutableListOf()
-        recyclerView = root.findViewById(R.id.bus_station_recycler_view)
-        swipeBackgroundColor = ColorDrawable(Color.parseColor("#FFEA4235")) // "#FF709DE0"
         userImageDao = UserImageDatabase.getDatabase(requireContext()).userImageDao()
+
+        recyclerView = root.findViewById(R.id.bus_station_recycler_view)
+        prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        swipeBackgroundColor = ColorDrawable(ContextCompat.getColor(requireContext(), R.color.red))
         busStationAdapter = BusStationsRecyclerAdapter(requireContext(), userImagesData, this)
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
@@ -63,15 +70,15 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
             (activity as MainActivity).supportActionBar?.title = it.street_name
         })
 
+        if (prefs.getBoolean("enable_pictures_grid", false)) {
+            recyclerView.layoutManager = GridLayoutManager(requireContext(), prefs.getInt("pictures_grid_columns", 2))
+        } else
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
         recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), userImagesData, this)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        return root
-    }
-
-    override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(root, savedInstanceState)
-
+        // Try to avoid UI refreshing images before picture was added or deleted
+        // Not sure if actually working, because unable to reproduce it since.
         runBlocking {
             val job: Job = launch(context = Dispatchers.IO) {
                 while (!sharedViewModel.canGetImages) {
@@ -83,7 +90,14 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
             recyclerView.adapter = BusStationsRecyclerAdapter(requireContext(), userImagesData, this@BusStationFragment)
         }
 
-        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)
+        if (prefs.getBoolean("enable_swipe_to_delete", true) && !prefs.getBoolean("enable_pictures_grid", false))
+            ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)
+
+        return root
+    }
+
+    override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(root, savedInstanceState)
 
         root.findViewById<FloatingActionButton>(R.id.add_picture).setOnClickListener {
             navController.navigate(R.id.action_bus_station_to_camera)
@@ -219,7 +233,10 @@ class BusStationFragment : Fragment(), BusStationsRecyclerAdapter.UserImagesItem
 
     @WorkerThread
     private fun getImages() {
-        val data = userImageDao.getImages(sharedViewModel.selectedBusStation.value?.street_name!!)
+        val data = userImageDao.getImages(
+            sharedViewModel.selectedBusStation.value?.street_name!!,
+            prefs.getString("preferred_pictures_sorting", "1")!!.toInt()
+        )
         for (image in data) {
             userImagesData.add(image)
         }

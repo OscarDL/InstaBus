@@ -2,6 +2,7 @@ package com.franscar.instabus.ui.image
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -20,21 +21,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import com.franscar.instabus.MainActivity
 import com.franscar.instabus.R
 import com.franscar.instabus.data.images.UserImage
+import com.franscar.instabus.data.images.UserImageDao
 import com.franscar.instabus.data.images.UserImageDatabase
 import com.franscar.instabus.ui.shared.SharedViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 import java.text.DateFormat
 import java.util.*
 
 class ImageFragment : Fragment() {
 
+    private lateinit var prefs: SharedPreferences
     private lateinit var navController: NavController
     private lateinit var sharedViewModel: SharedViewModel
 
@@ -46,6 +48,7 @@ class ImageFragment : Fragment() {
             root.findViewById<RelativeLayout>(R.id.image_fragment).setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
         }
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
@@ -111,22 +114,38 @@ class ImageFragment : Fragment() {
         val userImageDao = UserImageDatabase.getDatabase(requireContext()).userImageDao()
 
         root.findViewById<Button>(R.id.delete_image_button).setOnClickListener {
-            AlertDialog.Builder(requireContext())
-                .setTitle("Confirmation")
-                .setMessage("Do you really want to delete this picture?")
-                .setPositiveButton(" DELETE ") { _, _ ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        userImageDao.deleteImage(sharedViewModel.selectedImage.value!!.date)
-                        if(File(sharedViewModel.selectedImage.value!!.image).exists())
-                            File(sharedViewModel.selectedImage.value!!.image).delete()
-                    }
-                    Toast.makeText(context, "Picture successfully deleted.", Toast.LENGTH_SHORT).show()
-                    navController.navigateUp()
-                }
-                .setNegativeButton(" CANCEL ") { _, _ -> }
-                .create()
-                .show()
+
+            sharedViewModel.canGetImages = false
+
+            if (prefs.getBoolean("delete_confirmation_prompt", true)) {
+                AlertDialog.Builder(requireContext())
+                        .setTitle("Confirmation")
+                        .setMessage("Do you really want to delete this picture?")
+                        .setPositiveButton(" DELETE ") { _, _ ->
+                            deleteImage(userImageDao)
+                        }
+                        .setNegativeButton(" CANCEL ") { _, _ -> }
+                        .create()
+                        .show()
+            } else {
+                deleteImage(userImageDao)
+            }
         }
+    }
+
+    private fun deleteImage(userImageDao: UserImageDao) {
+        runBlocking {
+            val job: Job = launch(context = Dispatchers.IO) {
+                userImageDao.deleteImage(sharedViewModel.selectedImage.value!!.date)
+                if (File(sharedViewModel.selectedImage.value!!.image).exists())
+                    File(sharedViewModel.selectedImage.value!!.image).delete()
+            }
+            job.join()
+            sharedViewModel.canGetImages = true
+            job.join()
+            navController.navigateUp()
+        }
+        Toast.makeText(context, "Picture successfully deleted.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

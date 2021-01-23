@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
@@ -26,15 +27,19 @@ class BusStationsRecyclerAdapter(
         private val context: Context, private val userImages: MutableList<UserImage>, private val itemListener:
         UserImagesItemListener): RecyclerView.Adapter<BusStationsRecyclerAdapter.ViewHolder>() {
 
-    private var removedPosition: Int = 0
-    private lateinit var removedItem: UserImage
-
     override fun getItemCount() = userImages.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.bus_station_list_item, parent, false)
-        return ViewHolder(view)
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val layout =
+            if (!prefs.getBoolean("enable_pictures_grid", false))
+                R.layout.bus_station_list_item
+            else
+                R.layout.bus_station_grid_item
+
+        return ViewHolder(inflater.inflate(layout, parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -52,10 +57,6 @@ class BusStationsRecyclerAdapter(
                 .transform(CenterCrop(context))
                 .into(holder.userImageIcon)
 
-            /*if (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO)
-                userImageIcon.setColorFilter(ContextCompat.getColor(context, R.color.black), android.graphics.PorterDuff.Mode.SRC_IN)
-            */
-
             holder.itemView.setOnClickListener {
                 itemListener.onUserImageItemClick(userImage)
             }
@@ -70,27 +71,6 @@ class BusStationsRecyclerAdapter(
     fun restoreItem(position: Int, userImage: UserImage) {
         userImages.add(position, userImage)
         notifyItemInserted(position)
-    }
-
-    private fun rotate(bitmap: Bitmap, degrees: Int): Bitmap {
-        var image = bitmap
-        if (degrees != 0) {
-            val matrix = Matrix()
-            matrix.setRotate(
-                    degrees.toFloat(),
-                    image.width.toFloat() / 2,
-                    image.height.toFloat() / 2
-            )
-            val newImage = Bitmap.createBitmap(
-                    image, 0, 0, image.width,
-                    image.height, matrix, true
-            )
-            if (image != newImage) {
-                image.recycle()
-                image = newImage
-            }
-        }
-        return image
     }
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

@@ -5,7 +5,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -105,41 +105,38 @@ class PictureFragment : Fragment() {
 
         root.findViewById<Button>(R.id.save_picture_button).setOnClickListener {
 
-            sharedViewModel.canGetImages = false
+            if (name.text.toString().isEmpty()) {
+                Toast.makeText(context, "Please enter a name for your picture.", Toast.LENGTH_SHORT).show()
+            } else {
+                sharedViewModel.canGetImages = false
 
-            runBlocking {
-                val job: Job = launch(context = Dispatchers.IO) {
-                    userImageDao.insertImage(
+                runBlocking {
+                    val job: Job = launch(context = Dispatchers.IO) {
+                        userImageDao.insertImage(
                             UserImage(
-                                    0,
-                                    cameraViewModel.imageSrc.value.toString(),
-                                    name.text.toString(),
-                                    getDateInstance().format(Date()) + " - " + getTimeInstance().format(Date()),
-                                    ViewModelProvider(requireActivity()).get(SharedViewModel::class.java).selectedBusStation.value?.street_name!!
+                                0,
+                                cameraViewModel.imageSrc.value.toString(),
+                                name.text.toString(),
+                                getDateInstance().format(Date()) + " - " + getTimeInstance().format(Date()),
+                                ViewModelProvider(requireActivity()).get(SharedViewModel::class.java).selectedBusStation.value?.street_name!!
                             )
-                    )
+                        )
+                    }
+                    job.join()
+                    sharedViewModel.canGetImages = true
+                    job.join()
+                    navController.navigateUp()
+                    job.join()
+                    navController.navigateUp()
                 }
-                job.join()
-                sharedViewModel.canGetImages = true
+
+                Toast.makeText(context, "Picture saved successfully.", Toast.LENGTH_SHORT).show()
+
+                view?.let {
+                    val keyboard = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    keyboard.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, 0)
+                }
             }
-
-            Toast.makeText(context, "Picture saved successfully.", Toast.LENGTH_SHORT).show()
-
-            view?.let {
-                val keyboard = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                keyboard.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, 0)
-            }
-
-            /*
-            navController.navigate(
-                R.id.action_picture_to_bus_station, null,
-                NavOptions.Builder().setPopUpTo(R.id.pictureFragment, true).build()
-            )
-            */
-
-            // Can be used to be able to skip fragments on back button/gesture
-            navController.navigateUp()
-            navController.navigateUp()
         }
     }
 

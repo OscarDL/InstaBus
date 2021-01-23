@@ -50,8 +50,9 @@
                 android:textColor="#FFDDDDDD"
                 tools:ignore="RtlSymmetry"
                 android:paddingEnd="10dp"
-                android:singleLine="true"
-                android:textSize="21sp"/>
+                android:ellipsize="end"
+                android:textSize="21sp"
+                android:maxLines="1"/>
 
             <TextView
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -59,7 +60,9 @@
                 android:id="@+id/busStationDistance"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:textSize="14sp"/>
+                android:ellipsize="end"
+                android:textSize="14sp"
+                android:maxLines="1"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
