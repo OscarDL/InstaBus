@@ -61,7 +61,7 @@
             app:summaryOff="You will not be able to rotate the map."/>
 
         <SeekBarPreference
-            app:min="8"
+            app:min="10"
             android:max="40"
             app:defaultValue="31"
             app:seekBarIncrement="1"

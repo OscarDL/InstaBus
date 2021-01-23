@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -115,21 +116,21 @@ class ImageFragment : Fragment() {
 
         root.findViewById<Button>(R.id.delete_image_button).setOnClickListener {
 
-            sharedViewModel.canGetImages = false
-
             if (prefs.getBoolean("delete_confirmation_prompt", true)) {
                 AlertDialog.Builder(requireContext())
-                        .setTitle("Confirmation")
-                        .setMessage("Do you really want to delete this picture?")
-                        .setPositiveButton(" DELETE ") { _, _ ->
-                            deleteImage(userImageDao)
-                        }
-                        .setNegativeButton(" CANCEL ") { _, _ -> }
-                        .create()
-                        .show()
+                    .setTitle("Confirmation")
+                    .setMessage("Do you really want to delete this picture?")
+                    .setPositiveButton(" DELETE ") { _, _ ->
+                        deleteImage(userImageDao)
+                    }
+                    .setNegativeButton(" CANCEL ") { _, _ -> }
+                    .create()
+                    .show()
             } else {
+                sharedViewModel.canGetImages = false
                 deleteImage(userImageDao)
             }
+
         }
     }
 
