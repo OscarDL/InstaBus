@@ -29,4 +29,33 @@
     <string name="image">Image</string>
     <string name="image_date">Image date</string>
     <string name="no_picture">Could not find your picture.</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="application_colors">Application colors</string>
+    <string name="bus_stations">Bus stations</string>
+    <string name="display_list_as_grid">Display list as grid</string>
+    <string name="pictures">Pictures</string>
+    <string name="display_pictures_as_grid">Display pictures in a grid</string>
+    <string name="number_of_grid_columns">Number of grid columns</string>
+    <string name="number_of_columns_per_row">Number of columns per row</string>
+    <string name="delete_confirmation_prompt">Delete confirmation prompt</string>
+    <string name="confirm_before_delete">Confirm before delete</string>
+    <string name="confirm_picture_deletion">Confirm picture deletion</string>
+    <string name="map">Map</string>
+    <string name="default_map_zoom">Default map zoom</string>
+    <string name="enable_location">Enable location</string>
+    <string name="enable_multi_touch_rotation">Enable multi-touch rotation</string>
+    <string name="enable_swipe_to_delete">Swipe to delete picture</string>
 </resources>

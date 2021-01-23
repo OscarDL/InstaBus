@@ -173,6 +173,8 @@ class CameraFragment : Fragment() {
                         camera.cameraControl.enableTorch(false)
                         flash_button.setImageResource(R.drawable.ic_flash_off_36dp)
                     }
+                } else {
+                    Toast.makeText(requireContext(), "No flash unit found for this camera.", Toast.LENGTH_SHORT).show()
                 }
             }
 
