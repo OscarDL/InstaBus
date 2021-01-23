@@ -22,6 +22,8 @@ import androidx.preference.PreferenceManager
 import com.franscar.instabus.BuildConfig
 import com.franscar.instabus.R
 import com.franscar.instabus.ui.shared.SharedViewModel
+import com.franscar.instabus.utilities.refreshData
+import com.franscar.instabus.utilities.refreshMap
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -62,6 +64,8 @@ class MapFragment : Fragment() {
             map.overlays.add(rotationGestures)
         }
 
+        map.minZoomLevel = 3.5
+        map.maxZoomLevel = 21.0
         map.setUseDataConnection(true)
         map.setMultiTouchControls(true)
         map.setTileSource(TileSourceFactory.MAPNIK)
@@ -69,16 +73,17 @@ class MapFragment : Fragment() {
 
         val gPoint = GeoPoint(41.3985182, 2.1917991)
 
-        if(prefs.getBoolean("enable_start_animation", true)) {
-            map.minZoomLevel = 3.5
-            map.maxZoomLevel = 21.0
+        if(prefs.getBoolean("enable_map_animation", true) && refreshMap) {
             map.controller.setZoom(5.0)
             map.controller.setCenter(GeoPoint(40.9, 1.7))
             Handler(Looper.getMainLooper()).postDelayed({
-                map.controller.animateTo(gPoint, prefs.getInt("default_map_zoom", 16).toDouble(), 2000)
+                map.controller.animateTo(gPoint,
+                prefs.getInt("default_map_zoom", 31)/2.toDouble(),
+                2000)
             }, 200)
+            refreshMap = false
         } else {
-            map.controller.setZoom(prefs.getInt("default_map_zoom", 16).toDouble())
+            map.controller.setZoom(prefs.getInt("default_map_zoom", 31)/2.toDouble())
             map.controller.setCenter(gPoint)
         }
 
@@ -107,13 +112,7 @@ class MapFragment : Fragment() {
                 busMarker.icon = stationPin
                 busMarker.position = GeoPoint(item.lat, item.lon)
                 busMarker.setOnMarkerClickListener { _, _ ->
-                    /*var title = TextView(requireContext())
-                    title.text = item.street_name
-                    title.textSize = 20F
-                    title.setTypeface(null, Typeface.BOLD)
-                    title.setPadding(72, 48, 0,24)*/
                     AlertDialog.Builder(requireContext())
-                        //.setCustomTitle(title)
                         .setTitle(item.street_name)
                         .setMessage(if (item.buses.sumBy { if (item.buses.contains('-')) 1 else 0 } > 0) {
                             "Buses: "

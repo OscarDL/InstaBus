@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        app:title="@string/pictures">
+        app:title="@string/pictures"
+        app:icon="@drawable/ic_picture_settings_24dp">
 
         <SwitchPreference
             app:defaultValue="false"
@@ -44,18 +45,12 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="@string/map">
-
-        <!--
-        <SwitchPreference
-            app:defaultValue="true"
-            app:key="enable_location"
-            app:title="@string/enable_location"/>
-        -->
+        app:title="@string/map"
+        app:icon="@drawable/ic_map_settings_24dp">
 
         <SwitchPreference
             app:defaultValue="true"
-            app:key="enable_start_animation"
+            app:key="enable_map_animation"
             app:title="@string/enable_start_animation"/>
 
         <SwitchPreference
@@ -66,28 +61,14 @@
             app:summaryOff="You will not be able to rotate the map."/>
 
         <SeekBarPreference
-            app:min="4"
-            android:max="20"
-            app:defaultValue="16"
+            app:min="8"
+            android:max="40"
+            app:defaultValue="31"
+            app:seekBarIncrement="1"
             app:key="default_map_zoom"
             app:showSeekBarValue="true"
             app:title="@string/default_map_zoom"/>
 
     </PreferenceCategory>
-
-    <!--
-    <PreferenceCategory
-        app:title="@string/application_colors">
-
-        <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
-            app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-    -->
 
 </PreferenceScreen>
