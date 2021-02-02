@@ -121,6 +121,7 @@ class ImageFragment : Fragment() {
                     .setTitle("Confirmation")
                     .setMessage("Do you really want to delete this picture?")
                     .setPositiveButton(" DELETE ") { _, _ ->
+                        sharedViewModel.canGetImages = false
                         deleteImage(userImageDao)
                     }
                     .setNegativeButton(" CANCEL ") { _, _ -> }
